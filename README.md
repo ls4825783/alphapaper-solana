@@ -1,12 +1,17 @@
-# AlphaPaper - AI Whitepaper Scanner on Solana
+# AlphaPaper - Solana AI Whitepaper Scanner
 
-**V2 Features:**
-- Wallet login (Phantom/Solflare)
-- PDF upload → DeepSeek AI analysis
-- Bullish/Bearish + Tokenomics + Hype/Risk scores
-- cNFT reports (Metaplex Core)
-- RAG Chat with paper (pgvector)
-- On-chain Leaderboard (Helius)
-- Blinks ready
+V2: RAG Chat + cNFT Reports + On-chain Leaderboard
 
-Built for degens. LFG.
+## Features
+- Solana Wallet Login
+- PDF Upload → DeepSeek AI Analysis
+- Hype / Risk Scores
+- Compressed NFT Reports
+- RAG Chat with Paper
+- Helius Leaderboard
+
+## Quick Start
+```bash
+npm install
+npm run dev
+```
