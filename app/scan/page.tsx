@@ -13,7 +13,7 @@ export default function ScanPage() {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !publicKey) {
-      alert('Please connect wallet first');
+      alert('Connect wallet first!');
       return;
     }
 
@@ -24,55 +24,41 @@ export default function ScanPage() {
     form.append('pubkey', publicKey.toBase58());
 
     try {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL + '/functions/v1/scan-pdf';
-      
-      const res = await fetch(url, {
-        method: 'POST',
-        body: form,
-      });
+      const res = await fetch(
+        process.env.NEXT_PUBLIC_SUPABASE_URL + '/functions/v1/scan-pdf',
+        { method: 'POST', body: form }
+      );
 
       const data = await res.json();
       setResult(data);
-      alert('✅ Scan Complete!');
-      console.log('Full Report:', data);
+      alert('✅ Scan Complete! Check console (F12)');
+      console.log(data);
     } catch (err) {
-      console.error(err);
-      alert('Upload failed. Check console');
+      alert('Error: ' + err);
     }
 
     setUploading(false);
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-6">
-      <div className="max-w-2xl w-full">
-        <div className="flex justify-between items-center mb-12">
-          <h1 className="text-5xl font-bold">AlphaPaper</h1>
-          <WalletMultiButton className="!bg-purple-600 hover:!bg-purple-700" />
+    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-8">
+      <div className="max-w-xl w-full">
+        <div className="flex justify-between mb-12">
+          <h1 className="text-6xl font-bold">AlphaPaper</h1>
+          <WalletMultiButton />
         </div>
 
-        <div className="text-center mb-10">
-          <p className="text-2xl font-semibold">AI Whitepaper Scanner on Solana</p>
-          <p className="text-zinc-500 mt-2">Upload PDF → Get Instant Alpha</p>
-        </div>
-
-        <div className="border-2 border-dashed border-zinc-700 rounded-3xl p-20 text-center hover:border-purple-500 transition">
+        <div className="border-2 border-dashed border-zinc-700 rounded-3xl p-24 text-center hover:border-purple-600 transition">
           <input type="file" accept=".pdf" onChange={handleUpload} className="hidden" id="pdf" />
-          <label htmlFor="pdf" className="cursor-pointer flex flex-col items-center">
-            {uploading ? <Loader2 className="w-20 h-20 animate-spin text-purple-500" /> : <Upload className="w-20 h-20" />}
-            <p className="mt-8 text-2xl font-bold">
-              {uploading ? 'Analyzing with DeepSeek...' : 'Drop Whitepaper PDF'}
+          <label htmlFor="pdf" className="cursor-pointer block">
+            {uploading ? <Loader2 className="mx-auto w-20 h-20 animate-spin text-purple-500" /> : <Upload className="mx-auto w-20 h-20" />}
+            <p className="text-2xl font-bold mt-8">
+              {uploading ? "Analyzing with DeepSeek AI..." : "Drop Whitepaper PDF Here"}
             </p>
-            <p className="text-zinc-500 mt-3">or click to select</p>
           </label>
         </div>
 
-        {result && (
-          <div className="mt-8 p-6 bg-zinc-900 rounded-2xl">
-            <h3 className="font-bold text-xl mb-4">✅ Report Generated</h3>
-            <pre className="text-xs overflow-auto max-h-96 bg-black p-4 rounded-xl">{JSON.stringify(result, null, 2)}</pre>
-          </div>
-        )}
+        {result && <pre className="mt-8 bg-black p-6 rounded-2xl text-xs overflow-auto">{JSON.stringify(result, null, 2)}</pre>}
       </div>
     </div>
   );
