@@ -1,13 +1,12 @@
-# AlphaPaper - Solana AI Whitepaper Scanner
+# AlphaPaper - AI Whitepaper Scanner on Solana
 
-**The Bloomberg Terminal for Solana degens.**
+**V2 Features:**
+- Wallet login (Phantom/Solflare)
+- PDF upload → DeepSeek AI analysis
+- Bullish/Bearish + Tokenomics + Hype/Risk scores
+- cNFT reports (Metaplex Core)
+- RAG Chat with paper (pgvector)
+- On-chain Leaderboard (Helius)
+- Blinks ready
 
-Upload any whitepaper → Instant AI summary, bullish/bearish, tokenomics, hype/risk score + cNFT.
-
-## V2 Features
-- RAG Chat with the paper
-- On-chain Leaderboard
-- Blinks
-- Metaplex cNFT reports
-
-LFG 🚀
+Built for degens. LFG.
