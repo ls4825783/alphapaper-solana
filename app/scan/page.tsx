@@ -1,35 +1,21 @@
 ﻿'use client';
 
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
-import { clusterApiUrl } from '@solana/web3.js';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Upload, Loader2 } from 'lucide-react';
 
 export default function ScanPage() {
-  const network = 'devnet';
-  const endpoint = useMemo(() => clusterApiUrl(network), []);
-  const wallets = useMemo(() => [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter(),
-  ], []);
-
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
 
   const handleUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file) {
-      alert("Select a PDF");
-      return;
-    }
+    if (!file) return alert("Select a PDF");
 
     setUploading(true);
 
     const form = new FormData();
     form.append("pdf", file);
-    form.append("pubkey", "temp-wallet"); // temporary until wallet is connected
+    form.append("pubkey", "test-wallet"); // temporary
 
     try {
       const res = await fetch(
@@ -38,8 +24,8 @@ export default function ScanPage() {
       );
       const data = await res.json();
       setResult(data);
-      alert("✅ Scan Complete!");
-      console.log(data);
+      alert("✅ Scan Complete! Check console (F12)");
+      console.log("Report:", data);
     } catch (err) {
       alert("Error: " + err);
     }
@@ -48,34 +34,31 @@ export default function ScanPage() {
   };
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <div className="min-h-screen bg-zinc-950 text-white p-8">
-            <div className="max-w-2xl mx-auto">
-              <div className="flex justify-between items-center mb-12">
-                <h1 className="text-6xl font-bold">AlphaPaper</h1>
-                <WalletMultiButton />
-              </div>
+    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-8">
+      <div className="max-w-xl w-full text-center">
+        <h1 className="text-6xl font-bold mb-8">AlphaPaper</h1>
+        <p className="text-2xl mb-12">AI Whitepaper Scanner on Solana</p>
 
-              <div className="border-2 border-dashed border-zinc-700 rounded-3xl p-24 text-center hover:border-purple-500">
-                <input type="file" accept=".pdf" onChange={handleUpload} className="hidden" id="pdf" />
-                <label htmlFor="pdf" className="cursor-pointer block">
-                  {uploading ? <Loader2 className="mx-auto w-24 h-24 animate-spin text-purple-500" /> : <Upload className="mx-auto w-24 h-24" />}
-                  <p className="mt-8 text-2xl font-bold">Drop Whitepaper PDF</p>
-                </label>
-              </div>
+        <div className="border-2 border-dashed border-zinc-700 rounded-3xl p-24 hover:border-purple-500 transition">
+          <input type="file" accept=".pdf" onChange={handleUpload} className="hidden" id="pdf" />
+          <label htmlFor="pdf" className="cursor-pointer block">
+            {uploading ? (
+              <Loader2 className="mx-auto w-24 h-24 animate-spin text-purple-500" />
+            ) : (
+              <Upload className="mx-auto w-24 h-24" />
+            )}
+            <p className="mt-8 text-2xl font-bold">
+              {uploading ? "Analyzing..." : "Drop Whitepaper PDF"}
+            </p>
+          </label>
+        </div>
 
-              {result && (
-                <div className="mt-10 bg-zinc-900 p-6 rounded-2xl">
-                  <h3 className="font-bold mb-3">Result:</h3>
-                  <pre className="text-xs overflow-auto">{JSON.stringify(result, null, 2)}</pre>
-                </div>
-              )}
-            </div>
+        {result && (
+          <div className="mt-10 bg-zinc-900 p-6 rounded-2xl">
+            <pre className="text-xs overflow-auto">{JSON.stringify(result, null, 2)}</pre>
           </div>
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+        )}
+      </div>
+    </div>
   );
 }
