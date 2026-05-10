@@ -31,10 +31,10 @@ export default function ScanPage() {
 
       const data = await res.json();
       setResult(data);
-      alert('✅ Scan Complete!');
-      console.log('Report:', data);
+      alert('✅ Scan Complete! Check console');
+      console.log('Full Report:', data);
     } catch (err) {
-      alert('Upload failed');
+      alert('Upload failed: ' + err);
     }
 
     setUploading(false);
@@ -49,26 +49,16 @@ export default function ScanPage() {
         </div>
 
         <div className="text-center mb-10">
-          <p className="text-2xl font-semibold">AI Whitepaper Scanner on Solana</p>
-          <p className="text-zinc-500 mt-2">Upload → Get Summary + Hype/Risk Score</p>
+          <p className="text-2xl font-semibold">AI Whitepaper Scanner</p>
+          <p className="text-zinc-500 mt-2">Upload PDF → Get Bullish/Bearish + Scores</p>
         </div>
 
         <div className="border-2 border-dashed border-zinc-700 rounded-3xl p-20 text-center hover:border-purple-500 transition">
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handleUpload}
-            className="hidden"
-            id="pdf"
-          />
+          <input type="file" accept=".pdf" onChange={handleUpload} className="hidden" id="pdf" />
           <label htmlFor="pdf" className="cursor-pointer flex flex-col items-center">
-            {uploading ? (
-              <Loader2 className="w-20 h-20 animate-spin text-purple-500" />
-            ) : (
-              <Upload className="w-20 h-20" />
-            )}
+            {uploading ? <Loader2 className="w-20 h-20 animate-spin text-purple-500" /> : <Upload className="w-20 h-20" />}
             <p className="mt-8 text-2xl font-bold">
-              {uploading ? 'Analyzing with DeepSeek...' : 'Drop Whitepaper PDF'}
+              {uploading ? 'Analyzing with DeepSeek AI...' : 'Drop Whitepaper PDF'}
             </p>
             <p className="text-zinc-500 mt-3">or click to select</p>
           </label>
@@ -76,8 +66,8 @@ export default function ScanPage() {
 
         {result && (
           <div className="mt-8 p-6 bg-zinc-900 rounded-2xl">
-            <h3 className="font-bold text-xl">✅ Report Generated</h3>
-            <pre className="text-sm mt-4 overflow-auto">{JSON.stringify(result, null, 2)}</pre>
+            <h3 className="font-bold text-xl mb-4">✅ Report Generated</h3>
+            <pre className="text-xs overflow-auto max-h-96 bg-black p-4 rounded-xl">{JSON.stringify(result, null, 2)}</pre>
           </div>
         )}
       </div>
