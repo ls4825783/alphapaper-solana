@@ -1,70 +1,71 @@
 ﻿'use client';
 
-import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { useState } from 'react';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { clusterApiUrl } from '@solana/web3.js';
+import { useMemo, useState } from 'react';
 import { Upload, Loader2 } from 'lucide-react';
 
 export default function ScanPage() {
-  const { publicKey } = useWallet();
+  const network = 'devnet';
+  const endpoint = useMemo(() => clusterApiUrl(network), []);
+  const wallets = useMemo(() => [new PhantomWalletAdapter(), new SolflareWalletAdapter()], []);
+
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
 
-  const handleUpload = async (e) => {
+  const handleUpload = async (e, publicKey) => {
     const file = e.target.files[0];
     if (!file || !publicKey) {
-      alert('Connect wallet first!');
+      alert("Connect wallet first!");
       return;
     }
 
     setUploading(true);
 
     const form = new FormData();
-    form.append('pdf', file);
-    form.append('pubkey', publicKey.toBase58());
+    form.append("pdf", file);
+    form.append("pubkey", publicKey.toBase58());
 
     try {
       const res = await fetch(
-        process.env.NEXT_PUBLIC_SUPABASE_URL + '/functions/v1/scan-pdf',
-        { method: 'POST', body: form }
+        process.env.NEXT_PUBLIC_SUPABASE_URL + "/functions/v1/scan-pdf",
+        { method: "POST", body: form }
       );
-
       const data = await res.json();
       setResult(data);
-      alert('✅ Scan Complete! Check console (F12)');
-      console.log('Report:', data);
+      alert("✅ Scan Complete!");
+      console.log(data);
     } catch (err) {
-      alert('Error: ' + err);
+      alert("Error: " + err);
     }
 
     setUploading(false);
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-8">
-      <div className="max-w-xl w-full">
-        <div className="flex justify-between items-center mb-12">
-          <h1 className="text-6xl font-bold">AlphaPaper</h1>
-          <WalletMultiButton />
-        </div>
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-8">
+            <div className="max-w-xl w-full">
+              <div className="flex justify-between items-center mb-12">
+                <h1 className="text-6xl font-bold">AlphaPaper</h1>
+                <WalletMultiButton />
+              </div>
 
-        <div className="border-2 border-dashed border-zinc-700 rounded-3xl p-24 text-center hover:border-purple-500 transition">
-          <input type="file" accept=".pdf" onChange={handleUpload} className="hidden" id="pdf" />
-          <label htmlFor="pdf" className="cursor-pointer block">
-            {uploading ? <Loader2 className="mx-auto w-24 h-24 animate-spin text-purple-500" /> : <Upload className="mx-auto w-24 h-24" />}
-            <p className="mt-8 text-2xl font-bold">
-              {uploading ? 'Analyzing with DeepSeek...' : 'Drop Whitepaper PDF'}
-            </p>
-          </label>
-        </div>
-
-        {result && (
-          <div className="mt-10 bg-zinc-900 p-6 rounded-2xl">
-            <h3 className="font-bold">Result:</h3>
-            <pre className="text-xs overflow-auto mt-4">{JSON.stringify(result, null, 2)}</pre>
+              <div className="border-2 border-dashed border-zinc-700 rounded-3xl p-24 text-center hover:border-purple-500">
+                <input type="file" accept=".pdf" onChange={(e) => handleUpload(e, /* publicKey will be handled by context */)} className="hidden" id="pdf" />
+                <label htmlFor="pdf" className="cursor-pointer block">
+                  {uploading ? <Loader2 className="mx-auto w-24 h-24 animate-spin text-purple-500" /> : <Upload className="mx-auto w-24 h-24" />}
+                  <p className="mt-8 text-2xl font-bold">Drop Whitepaper PDF</p>
+                </label>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
-    </div>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   );
 }
