@@ -24,17 +24,20 @@ export default function ScanPage() {
     form.append('pubkey', publicKey.toBase58());
 
     try {
-      const res = await fetch(
-        \/functions/v1/scan-pdf,
-        { method: 'POST', body: form }
-      );
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL + '/functions/v1/scan-pdf';
+      
+      const res = await fetch(url, {
+        method: 'POST',
+        body: form,
+      });
 
       const data = await res.json();
       setResult(data);
-      alert('✅ Scan Complete! Check console');
+      alert('✅ Scan Complete!');
       console.log('Full Report:', data);
     } catch (err) {
-      alert('Upload failed: ' + err);
+      console.error(err);
+      alert('Upload failed. Check console');
     }
 
     setUploading(false);
@@ -49,8 +52,8 @@ export default function ScanPage() {
         </div>
 
         <div className="text-center mb-10">
-          <p className="text-2xl font-semibold">AI Whitepaper Scanner</p>
-          <p className="text-zinc-500 mt-2">Upload PDF → Get Bullish/Bearish + Scores</p>
+          <p className="text-2xl font-semibold">AI Whitepaper Scanner on Solana</p>
+          <p className="text-zinc-500 mt-2">Upload PDF → Get Instant Alpha</p>
         </div>
 
         <div className="border-2 border-dashed border-zinc-700 rounded-3xl p-20 text-center hover:border-purple-500 transition">
@@ -58,7 +61,7 @@ export default function ScanPage() {
           <label htmlFor="pdf" className="cursor-pointer flex flex-col items-center">
             {uploading ? <Loader2 className="w-20 h-20 animate-spin text-purple-500" /> : <Upload className="w-20 h-20" />}
             <p className="mt-8 text-2xl font-bold">
-              {uploading ? 'Analyzing with DeepSeek AI...' : 'Drop Whitepaper PDF'}
+              {uploading ? 'Analyzing with DeepSeek...' : 'Drop Whitepaper PDF'}
             </p>
             <p className="text-zinc-500 mt-3">or click to select</p>
           </label>
